@@ -28,6 +28,7 @@ ___
 Templates parameter: Point type
 ___
 Future work:
+- remove switch and if statements.
 - add comments, algorithms, functions  and exception handling
 - update layout to accommodate new features
 - improve README file and code diagram
