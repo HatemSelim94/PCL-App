@@ -1,37 +1,32 @@
-## Welcome to GitHub Pages
+# Simple PCL application
+### Functions available
+* Load, save and convert files
+  * supported extensions: .pcd .txt
+* Filtering
+  * available algorithms: voxel grid filtering.
+* Clustering
+  * available algorithms: euclidean clustering.
 
-You can use the [editor on GitHub](https://github.com/HatemSelim94/PCL-App/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+___
+### Application layout
+* Check it [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing).  *(set the quality to 720p manually)*
+![](media/layout.PNG)
+___
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+  ![](media/diagram.PNG)
+* Templates
+  * PclProcessor
+    * FileManeger
+    * ClusterManager
+      * Euclidean
+    * FilterManger
+      * VoxelFilter
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/HatemSelim94/PCL-App/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Templates parameter: Point type
+___
+Future work:
+- remove switch and if statements.
+- add comments, algorithms, functions  and exception handling
+- update layout to accommodate new features
+- improve README file and code diagram
