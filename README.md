@@ -1,4 +1,5 @@
 # Simple PCL application
+* Check it [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing).  *(set the quality to 720p manually)*
 ### Functions available
 * Load, save and convert files
   * supported extensions: .pcd .txt
@@ -9,7 +10,6 @@
 
 ___
 ### Application layout
-* Check it [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing).  *(set the quality to 720p manually)*
 ![](media/layout.PNG)
 ___
 
