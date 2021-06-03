@@ -24,6 +24,7 @@ ___
       * VoxelFilter
 
 Templates parameter: Point type
+* The +/- signs in the diagram does not represent the accessibility 
 ___
 Future work:
 - remove switch and if statements
