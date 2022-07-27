@@ -12,20 +12,6 @@ ___
 ### Application layout
 ![](media/layout.PNG)
 ___
-
-
-  ![](media/diagram.PNG)
-* Templates
-  * PclProcessor
-    * FileManeger
-    * ClusterManager
-      * Euclidean
-    * FilterManger
-      * VoxelFilter
-
-Templates parameter: Point type
-* The +/- signs in the diagram does not represent the accessibility 
-___
 Future work:
 - remove switch and if statements
 - add comments, new features and functions  and exceptions handling
