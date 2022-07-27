@@ -1,4 +1,7 @@
 # Simple PCL application
+
+![](media/gif.gif)
+
 * Check it [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing).  *(set the quality to 720p manually)*
 ### Functions available
 * Load, save and convert files
