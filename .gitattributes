@@ -1,0 +1,3 @@
+# Store text files with LF in the repository on every platform; Git converts
+# on checkout according to each user's settings. Binary files are detected.
+* text=auto
