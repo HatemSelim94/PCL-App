@@ -11,6 +11,7 @@
 #include <string>
 
 #include "core/cloud_session.h"
+#include "core/summary.h"
 
 namespace fs = std::filesystem;
 using pcl::PointXYZ;
@@ -129,6 +130,21 @@ TEST_CASE("euclidean clustering separates two distant blobs") {
     CHECK_THROWS_AS(pclapp::euclideanClusters(cloud, params), std::invalid_argument);
 
     CHECK(pclapp::euclideanClusters(pcl::make_shared<pcl::PointCloud<PointXYZ>>(), {}).empty());
+}
+
+TEST_CASE("summary reports count, bounding box and centroid") {
+    const auto cube = makeCube(4, 0.25f, /*origin=*/1.0f);  // spans [1, 1.75] on each axis
+
+    const auto summary = pclapp::summarize(*cube);
+    CHECK(summary.pointCount == 64);
+    REQUIRE(summary.extent.has_value());
+    CHECK(summary.extent->min == pclapp::Vec3{1.0f, 1.0f, 1.0f});
+    CHECK(summary.extent->max == pclapp::Vec3{1.75f, 1.75f, 1.75f});
+    CHECK(summary.extent->centroid == pclapp::Vec3{1.375f, 1.375f, 1.375f});
+
+    const auto empty = pclapp::summarize(pcl::PointCloud<PointXYZ>());
+    CHECK(empty.pointCount == 0);
+    CHECK_FALSE(empty.extent.has_value());
 }
 
 TEST_CASE("a session writes derived files beside its source and never appends") {
