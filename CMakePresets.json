@@ -1,0 +1,39 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "core",
+      "displayName": "Core and tests, PCL from the system (Linux)",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PCLAPP_BUILD_APP": "OFF"
+      }
+    },
+    {
+      "name": "core-vcpkg",
+      "displayName": "Core and tests, PCL from vcpkg (Windows)",
+      "inherits": "core",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    }
+  ],
+  "buildPresets": [
+    { "name": "core", "configurePreset": "core", "configuration": "Release" },
+    { "name": "core-vcpkg", "configurePreset": "core-vcpkg", "configuration": "Release" }
+  ],
+  "testPresets": [
+    {
+      "name": "core",
+      "configurePreset": "core",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "core-vcpkg",
+      "configurePreset": "core-vcpkg",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

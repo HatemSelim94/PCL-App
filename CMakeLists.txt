@@ -1,58 +1,74 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
-project(PclApp LANGUAGES CXX)
+# C is enabled next to C++ on purpose: on Ubuntu, PCL's package config pulls
+# in VTK, and VTK's MPI dependency (MPI::MPI_C) only exists when C is enabled.
+project(PclApp VERSION 2.0 LANGUAGES C CXX)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
-# Check http://doc.qt.io/qt-5/deployment-android.html for more information.
-# They need to be set before the find_package(Qt5 ...) call.
+option(PCLAPP_BUILD_APP   "Build the Qt desktop application" ON)
+option(PCLAPP_BUILD_TESTS "Build the unit tests (fetches Catch2)" ON)
 
-#if(ANDROID)
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
-#        set(ANDROID_EXTRA_LIBS
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
-#    endif()
-#endif()
-find_package(PCL 1.8.1 REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Boost)
-
-FIND_PACKAGE(VTK)
-INCLUDE(${VTK_USE_FILE})
-
-include_directories(${PCL_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
+# ---------------------------------------------------------------------------
+# Processing core: header-only, Qt-free, so it builds and tests on a plain
+# CI runner with nothing but PCL installed.
+# ---------------------------------------------------------------------------
+set(PCLAPP_PCL_COMPONENTS common io filters search segmentation)
+if(PCLAPP_BUILD_APP)
+  list(APPEND PCLAPP_PCL_COMPONENTS visualization)
+endif()
+find_package(PCL 1.11 REQUIRED COMPONENTS ${PCLAPP_PCL_COMPONENTS})
 link_directories(${PCL_LIBRARY_DIRS})
-add_definitions(${PCL_DEFINITIONS})
 
+add_library(pclapp_core INTERFACE)
+target_include_directories(pclapp_core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ${PCL_INCLUDE_DIRS})
+target_link_libraries(pclapp_core INTERFACE ${PCL_LIBRARIES})
+target_compile_definitions(pclapp_core INTERFACE ${PCL_DEFINITIONS})
 
-if(ANDROID)
-  add_library(PclApp SHARED
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    pclprocessor.h
-    pclprocessor.cpp
-  )
-else()
+# Warning level for our own translation units (not forced on consumers).
+add_library(pclapp_warnings INTERFACE)
+target_compile_options(pclapp_warnings INTERFACE
+  $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive->
+  $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
+
+# ---------------------------------------------------------------------------
+# Desktop application (Qt5 Widgets + VTK 8 QVTKWidget)
+# ---------------------------------------------------------------------------
+if(PCLAPP_BUILD_APP)
+  find_package(Qt5 REQUIRED COMPONENTS Widgets)
+  find_package(VTK REQUIRED)
+  if(VTK_VERSION VERSION_LESS 9 AND VTK_USE_FILE)
+    include(${VTK_USE_FILE})
+  endif()
+
+  set(CMAKE_AUTOMOC ON)
+  set(CMAKE_AUTOUIC ON)
+
   add_executable(PclApp
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    pclprocessor.h
-    pclprocessor.cpp
-  )
+    app/main.cpp
+    app/mainwindow.cpp
+    app/mainwindow.h
+    app/mainwindow.ui)
+  target_link_libraries(PclApp PRIVATE pclapp_core pclapp_warnings Qt5::Widgets ${VTK_LIBRARIES})
 endif()
 
-target_link_libraries(PclApp PRIVATE Qt5::Widgets ${PCL_LIBRARIES} ${Boost_LIBRARIES} vtkGUISupportQt)
+# ---------------------------------------------------------------------------
+# Unit tests
+# ---------------------------------------------------------------------------
+if(PCLAPP_BUILD_TESTS)
+  include(FetchContent)
+  FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.8.0)
+  FetchContent_MakeAvailable(Catch2)
+
+  add_executable(pclapp_tests tests/core_tests.cpp)
+  target_link_libraries(pclapp_tests PRIVATE pclapp_core pclapp_warnings Catch2::Catch2WithMain)
+
+  enable_testing()
+  list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+  include(Catch)
+  catch_discover_tests(pclapp_tests)
+endif()

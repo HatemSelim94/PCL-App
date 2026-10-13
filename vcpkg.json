@@ -1,0 +1,9 @@
+{
+  "name": "pclapp",
+  "version-string": "2.0",
+  "description": "Point cloud loading, voxel downsampling and Euclidean clustering on top of PCL.",
+  "builtin-baseline": "e456309491fd875487bf02b8a0dca76c1b1b00cc",
+  "dependencies": [
+    "pcl"
+  ]
+}
