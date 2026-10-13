@@ -38,7 +38,8 @@
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "VCPKG_MANIFEST_FEATURES": "app",
-        "VCPKG_INSTALLED_DIR": "$env{VCPKG_ROOT}/installed"
+        "VCPKG_INSTALLED_DIR": "$env{VCPKG_ROOT}/installed",
+        "VCPKG_INSTALL_OPTIONS": "--clean-buildtrees-after-build;--clean-packages-after-build"
       }
     }
   ],

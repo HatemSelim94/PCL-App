@@ -216,7 +216,9 @@ PCL's visualization module, VTK with Qt support and Qt 6, which vcpkg builds
 from source the first time; this takes hours. This preset installs the
 dependencies into vcpkg's own `installed` folder instead of the build tree:
 one of them (libiconv, built with autotools) fails when the install path
-contains a space, as a project folder easily does.
+contains a space, as a project folder easily does. It also tells vcpkg to
+delete each package's build tree once the package is built, because the Qt
+and VTK build trees take tens of gigabytes.
 
 ```bat
 set VCPKG_ROOT=C:cpkg
