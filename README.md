@@ -1,49 +1,59 @@
 # PCL App
 
-A small Qt desktop tool for loading, downsampling, clustering and converting
-point clouds, built on the Point Cloud Library (PCL) and VTK.
+Loading, voxel downsampling and Euclidean clustering of point clouds, in four layers:
+
+* a header-only **C++17 core** on top of the Point Cloud Library (PCL), with unit tests
+* **Python bindings** for that core (pybind11)
+* an **MCP server** that lets an LLM such as Claude load, filter and cluster clouds
+  through the same code, running locally over stdio with no network access
+* the original **Qt desktop application**
 
 ![](media/gif.gif)
 
-*The recording shows the 2021 version of the application.*
-
+*The recording shows the 2021 version of the desktop application.*
 Video walkthrough [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing)
 *(set the quality to 720p manually)*.
 
 ## Status
 
-The code was rewritten in C++17 in October 2026. What has been built and run so far:
+The code was rewritten in C++17 in October 2026. This table lists what has
+actually been built and run, and where:
 
-| Part | Linux | Windows |
+| Part | Linux (Ubuntu 24.04, GCC 13, PCL 1.14) | Windows 11 (Visual Studio 2022, MSVC 19.44, PCL 1.15.1 from vcpkg) |
 | --- | --- | --- |
-| Core and unit tests | Ubuntu 24.04, GCC 13, PCL 1.14: builds, 7 of 7 tests pass | Windows 11, Visual Studio 2022 (MSVC 19.44), PCL 1.15.1 from vcpkg: builds, 7 of 7 tests pass |
-| Desktop application | not built yet since the rewrite | not built yet since the rewrite |
+| Core and C++ tests | builds, 8 of 8 tests pass | builds, 8 of 8 tests pass |
+| Python package and tests | Python 3.11, 3.12 and 3.13: 21 of 21 tests pass | Python 3.12: 20 pass, 1 skipped (it creates a symlink, which needs extra rights on Windows) |
+| MCP server used from Claude Code | not tried; covered by the tests, which drive the server with the MCP SDK's client | registered in Claude Code and used to load, cluster and save the sample cloud |
+| Desktop application | not built since the rewrite | not built since the rewrite |
 
-The desktop application still targets Qt 5 with VTK 8 (`QVTKWidget`). VTK 9 removed
-that widget, so the application has to be ported before it builds on current
-toolchains. Until then, only the core is verified.
+On every push, the CI workflow repeats the Linux build, the C++ tests and the
+Python tests (with the runner's system Python).
 
-The geometry algorithms (voxel grid filter, Euclidean cluster extraction, PCD
-I/O) are PCL's. The design around them, described below, is mine. The rewrite
-was done together with Claude Code.
+The desktop application still targets Qt 5 with VTK 8 (`QVTKWidget`). VTK 9
+removed that widget, so the application has to be ported before it builds on
+current toolchains.
 
-## Features
-
-* Load `.pcd` and plain-text (`x y z [intensity]`) clouds as `PointXYZ` or `PointXYZI`
-* Voxel-grid downsampling
-* Euclidean cluster extraction, each cluster drawn in a distinct colour
-* Save the filtered cloud, or convert the source between `.pcd` and `.txt`
+**What is mine and what is not.** The geometry algorithms (voxel grid filter,
+Euclidean cluster extraction, bounding box, centroid, PCD I/O) are PCL's. The
+design around them, described below, is mine. The 2026 rewrite, the bindings
+and the MCP server were built together with [Claude Code](https://claude.com/claude-code);
+the commits that came out of that work carry a `Co-Authored-By: Claude` line.
 
 ## Layout
 
 ```
-core/   Header-only processing core (C++17, PCL only, no Qt)
+core/     Header-only processing core (C++17, PCL only, no Qt)
   cloud_io.h        load/save for PCD and text, format detection, IoError
   processing.h      voxelDownsample(), euclideanClusters() as pure functions
+  summary.h         summarize(): point count, bounding box, centroid
   cloud_session.h   CloudSession<PointT> owning one loaded cloud and its results;
                     AnyCloudSession = std::variant over the supported point types
-app/    Qt5 Widgets front end (MainWindow + .ui)
-tests/  Catch2 unit tests for the core
+python/   Python package "pclapp"
+  src/bindings.cpp        pybind11 bindings for the core
+  pclapp/mcp_server.py    MCP server built on the bindings
+app/      Qt5 Widgets front end (MainWindow + .ui)
+tests/    Catch2 tests for the core, pytest tests for the package and the server
+data/     A small synthetic sample cloud and the script that generates it
 ```
 
 ### Design notes
@@ -52,14 +62,19 @@ tests/  Catch2 unit tests for the core
   intensity channel share a single code path, selected with `if constexpr`
   on PCL's field traits instead of a duplicated template specialisation.
 * **Type dispatch happens once.** The UI holds an `AnyCloudSession` variant and
-  every handler is a single `std::visit`. Adding a point type means adding one
-  alternative to the variant and one case to `openCloud()`.
+  every handler is a single `std::visit`. The Python bindings use the same
+  idea: a `Cloud` holds an XYZ or XYZI cloud in a variant, and each function
+  dispatches to the templated core with one `std::visit`.
 * **Core is testable in isolation.** It has no Qt or VTK dependency, so CI
-  builds and runs the tests on a plain Linux runner with only `libpcl-dev`.
-* **Errors are explicit.** File problems raise `IoError` with the path and line
-  number; bad parameters raise `std::invalid_argument`. The UI reports both.
+  builds and runs the tests on a plain Linux runner.
+* **Errors are explicit.** File problems raise `IoError` whose message names the
+  file and, for parse errors, the line. Bad parameters raise
+  `std::invalid_argument`. In Python these arrive as `pclapp.IoError` and
+  `ValueError`.
+* **No geometry code outside the core.** The bindings only convert types, and
+  the MCP server only keeps track of clouds and checks paths.
 
-## Building the core and running the tests
+## Building the core and running the C++ tests
 
 Requirements: CMake 3.16+ (3.21+ for the presets), a C++17 compiler and PCL 1.11+.
 Qt and VTK are not needed for this part.
@@ -77,17 +92,116 @@ Windows, with Visual Studio 2022 and PCL from [vcpkg](https://github.com/microso
 source, which takes a while (about half an hour on the machine used here):
 
 ```bat
+set VCPKG_ROOT=C:\vcpkg
 cmake --preset core-vcpkg
 cmake --build --preset core-vcpkg
 ctest --preset core-vcpkg
 ```
 
-## Building the desktop application
+## Python package
 
-Not possible on current toolchains yet, see [Status](#status). The application
+`pip` builds the extension module with CMake (through scikit-build-core) and
+installs it as the package `pclapp`. Python 3.10 or newer is required.
+
+Linux (needs `libpcl-dev`, `python3-dev` and `python3-venv`):
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install ".[test]"
+.venv/bin/python -m pytest
+```
+
+Windows (PCL comes from vcpkg again; its DLLs are copied next to the module,
+so nothing has to be added to `PATH`):
+
+```bat
+set VCPKG_ROOT=C:\vcpkg
+set CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+python -m venv .venv
+.venv\Scripts\python -m pip install ".[test]"
+.venv\Scripts\python -m pytest
+```
+
+Use `pip install .` for the bindings alone, or `pip install ".[mcp]"` to add
+what the MCP server needs.
+
+```python
+import pclapp
+
+cloud = pclapp.load("data/sample_objects.pcd")      # 3630 points
+small = pclapp.voxel_downsample(cloud, leaf_size=0.05)
+clusters = pclapp.euclidean_cluster(cloud, tolerance=0.15, min_size=50, max_size=len(cloud))
+
+for cluster in clusters:                             # 2000, 1200 and 400 points
+    print(cluster.summary())                         # count, bounding box, centroid
+
+pclapp.save(clusters[0], "largest.pcd")
+```
+
+## MCP server
+
+`pclapp-mcp` (or `python -m pclapp.mcp_server`) is a
+[Model Context Protocol](https://modelcontextprotocol.io) server built with the
+MCP Python SDK v2. It gives a model six tools:
+
+| Tool | What it does |
+| --- | --- |
+| `list_clouds` | Lists the clouds in memory and the files that can be loaded |
+| `load_cloud` | Loads a `.pcd`, `.txt` or `.xyz` file and returns its id and summary |
+| `describe_cloud` | Point count, bounding box, centroid and origin of a cloud |
+| `downsample` | Voxel-grid downsampling; returns a new cloud |
+| `cluster` | Euclidean clustering; each cluster becomes a new cloud with its own id |
+| `save_cloud` | Writes a cloud to a file |
+
+How it is confined:
+
+* It talks over stdio only and makes no network calls.
+* It reads and writes files only inside one data directory given at start-up.
+  Paths that leave it through `..`, an absolute path or a symlink are refused.
+* `save_cloud` does not overwrite an existing file unless asked to.
+* Clouds live in the server's memory and are addressed by id (`cloud-1`,
+  `cloud-2`, ...). No tool changes a cloud in place.
+
+### Using it from Claude Code
+
+Register the server once, with the full path of the executable in your virtual
+environment and the folder it may use. On Windows:
+
+```bat
+claude mcp add --transport stdio pclapp -- "C:\path\to\PCL-App\.venv\Scripts\pclapp-mcp.exe" --data-dir "C:\path\to\PCL-App\data"
+```
+
+On Linux the executable is `.venv/bin/pclapp-mcp`. `claude mcp list` should then
+show `pclapp` as connected, and `/mcp` inside a session lists the tools.
+
+An example prompt for the sample cloud in `data/`:
+
+> Using the pclapp tools: list what can be loaded, load sample_objects.pcd, tell
+> me its size and bounding box, cluster it with tolerance 0.15 and minimum size
+> 50, and save the largest cluster as largest.pcd.
+
+Claude Code on Windows 11 completed this request and wrote `data/largest.pcd`
+with 2000 points. These are the four tool calls behind it and what they return:
+
+| Call | Result |
+| --- | --- |
+| `list_clouds` | no clouds in memory, one loadable file: `sample_objects.pcd` |
+| `load_cloud` | `cloud-1`, 3630 points, bounding box (-0.75, -0.93, -0.01) to (4.99, 3.92, 2.94) |
+| `cluster` | 3 clusters of 2000, 1200 and 400 points (`cloud-2` to `cloud-4`); the 30 stray points are dropped |
+| `save_cloud` | `largest.pcd`, 2000 points |
+
+The sample cloud is synthetic: a hollow box, a sphere, a small cube and 30
+stray points, generated by `data/make_sample.py`.
+
+## Desktop application
+
+Not buildable on current toolchains yet, see [Status](#status). The application
 needs Qt 5 Widgets and VTK 8 in addition to PCL, and is switched on with
-`-DPCLAPP_BUILD_APP=ON` (the default when the option is not given).
+`-DPCLAPP_BUILD_APP=ON` (the default when the option is not given). Its features:
 
-## Application layout
+* Load `.pcd` and plain-text (`x y z [intensity]`) clouds as `PointXYZ` or `PointXYZI`
+* Voxel-grid downsampling
+* Euclidean cluster extraction, each cluster drawn in a distinct colour
+* Save the filtered cloud, or convert the source between `.pcd` and `.txt`
 
 ![](media/layout.PNG)

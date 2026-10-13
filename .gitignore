@@ -41,3 +41,8 @@ __pycache__/
 dist/
 *.egg-info/
 *.pyd
+
+# Files written into the sample data folder while trying things out
+data/*
+!data/sample_objects.pcd
+!data/make_sample.py
