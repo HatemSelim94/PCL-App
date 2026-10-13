@@ -10,6 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(PCLAPP_BUILD_APP   "Build the Qt desktop application" ON)
 option(PCLAPP_BUILD_TESTS "Build the unit tests (fetches Catch2)" ON)
+option(PCLAPP_BUILD_PYTHON "Build the Python bindings (needs pybind11)" OFF)
 
 # ---------------------------------------------------------------------------
 # Processing core: header-only, Qt-free, so it builds and tests on a plain
@@ -71,4 +72,11 @@ if(PCLAPP_BUILD_TESTS)
   list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
   include(Catch)
   catch_discover_tests(pclapp_tests)
+endif()
+
+# ---------------------------------------------------------------------------
+# Python bindings (pybind11). Usually built through `pip install .`
+# ---------------------------------------------------------------------------
+if(PCLAPP_BUILD_PYTHON)
+  add_subdirectory(python)
 endif()

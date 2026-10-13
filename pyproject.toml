@@ -1,0 +1,35 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pclapp"
+version = "2.0.0"
+description = "Point cloud loading, voxel downsampling and Euclidean clustering on top of PCL, with an MCP server."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp>=2,<3"]
+test = ["pytest>=8", "mcp>=2,<3"]
+
+[project.scripts]
+pclapp-mcp = "pclapp.mcp_server:main"
+
+# scikit-build-core runs the project's CMake build and packs the result into a
+# wheel. Only the Python module is switched on; the GUI and C++ tests stay off.
+[tool.scikit-build]
+wheel.packages = ["python/pclapp"]
+# Keep the CMake build tree between runs instead of using a temporary folder:
+# rebuilds are faster and the build logs stay available.
+build-dir = "build/{wheel_tag}"
+
+[tool.scikit-build.cmake.define]
+PCLAPP_BUILD_PYTHON = "ON"
+PCLAPP_BUILD_APP = "OFF"
+PCLAPP_BUILD_TESTS = "OFF"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]

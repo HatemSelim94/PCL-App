@@ -14,6 +14,8 @@ IncludeCategories:
     Priority: 1
   - Regex: '^<catch2/'
     Priority: 1
+  - Regex: '^<pybind11/'
+    Priority: 1
   - Regex: '^<.*>'
     Priority: 2
   - Regex: '^".*"'
