@@ -35,14 +35,17 @@ target_compile_options(pclapp_warnings INTERFACE
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 # ---------------------------------------------------------------------------
-# Desktop application (Qt5 Widgets + VTK 8 QVTKWidget)
+# Desktop application (Qt Widgets + VTK 9 QVTKOpenGLNativeWidget)
 # ---------------------------------------------------------------------------
 if(PCLAPP_BUILD_APP)
-  find_package(Qt5 REQUIRED COMPONENTS Widgets)
-  find_package(VTK REQUIRED)
-  if(VTK_VERSION VERSION_LESS 9 AND VTK_USE_FILE)
-    include(${VTK_USE_FILE})
-  endif()
+  # The 3D view is VTK's Qt widget (module GUISupportQt), drawn by the
+  # OpenGL backend (RenderingOpenGL2).
+  find_package(VTK 9 REQUIRED COMPONENTS GUISupportQt RenderingOpenGL2)
+
+  # VTK is built against one Qt major version and the application must use the
+  # same one: Qt 6 with vcpkg, Qt 5 with the Ubuntu 24.04 packages. VTK reports
+  # which in VTK_QT_VERSION. The application code is the same for both.
+  find_package(Qt${VTK_QT_VERSION} REQUIRED COMPONENTS Widgets)
 
   set(CMAKE_AUTOMOC ON)
   set(CMAKE_AUTOUIC ON)
@@ -52,7 +55,21 @@ if(PCLAPP_BUILD_APP)
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui)
-  target_link_libraries(PclApp PRIVATE pclapp_core pclapp_warnings Qt5::Widgets ${VTK_LIBRARIES})
+  target_link_libraries(PclApp PRIVATE
+    pclapp_core pclapp_warnings Qt${VTK_QT_VERSION}::Widgets ${VTK_LIBRARIES})
+
+  # VTK 9 picks implementations (such as the OpenGL render window) through
+  # factories that every executable using VTK has to register.
+  vtk_module_autoinit(TARGETS PclApp MODULES ${VTK_LIBRARIES})
+
+  # Windows: Qt loads its platform plugin at run time from a folder next to
+  # the executable. windeployqt puts it there after each build. (vcpkg's own
+  # post-build step copies the DLLs, but only Qt 5 plugins.)
+  if(WIN32 AND TARGET Qt6::windeployqt)
+    add_custom_command(TARGET PclApp POST_BUILD
+      COMMAND Qt6::windeployqt --no-translations --no-compiler-runtime "$<TARGET_FILE:PclApp>"
+      COMMENT "Copying the Qt plugins next to PclApp")
+  endif()
 endif()
 
 # ---------------------------------------------------------------------------

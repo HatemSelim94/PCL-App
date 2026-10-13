@@ -33,6 +33,7 @@
 
 # Build output
 build/
+build-app/
 
 # Python
 __pycache__/

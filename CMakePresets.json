@@ -1,6 +1,10 @@
 {
   "version": 3,
-  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "core",
@@ -16,24 +20,65 @@
       "displayName": "Core and tests, PCL from vcpkg (Windows)",
       "inherits": "core",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+    },
+    {
+      "name": "app",
+      "displayName": "Desktop application, PCL/VTK/Qt from the system (Linux)",
+      "binaryDir": "${sourceDir}/build-app",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PCLAPP_BUILD_APP": "ON",
+        "PCLAPP_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "app-vcpkg",
+      "displayName": "Desktop application, PCL/VTK/Qt 6 from vcpkg (Windows)",
+      "inherits": "app",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "app"
+      }
     }
   ],
   "buildPresets": [
-    { "name": "core", "configurePreset": "core", "configuration": "Release" },
-    { "name": "core-vcpkg", "configurePreset": "core-vcpkg", "configuration": "Release" }
+    {
+      "name": "core",
+      "configurePreset": "core",
+      "configuration": "Release"
+    },
+    {
+      "name": "core-vcpkg",
+      "configurePreset": "core-vcpkg",
+      "configuration": "Release"
+    },
+    {
+      "name": "app",
+      "configurePreset": "app",
+      "configuration": "Release"
+    },
+    {
+      "name": "app-vcpkg",
+      "configurePreset": "app-vcpkg",
+      "configuration": "Release"
+    }
   ],
   "testPresets": [
     {
       "name": "core",
       "configurePreset": "core",
       "configuration": "Release",
-      "output": { "outputOnFailure": true }
+      "output": {
+        "outputOnFailure": true
+      }
     },
     {
       "name": "core-vcpkg",
       "configurePreset": "core-vcpkg",
       "configuration": "Release",
-      "output": { "outputOnFailure": true }
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }

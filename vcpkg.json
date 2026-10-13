@@ -5,5 +5,41 @@
   "builtin-baseline": "e456309491fd875487bf02b8a0dca76c1b1b00cc",
   "dependencies": [
     "pcl"
-  ]
+  ],
+  "features": {
+    "app": {
+      "description": "Qt desktop application with a VTK 3D view",
+      "dependencies": [
+        {
+          "name": "pcl",
+          "features": [
+            "visualization"
+          ]
+        },
+        {
+          "name": "vtk",
+          "default-features": false,
+          "features": [
+            "opengl",
+            "qt"
+          ]
+        },
+        {
+          "name": "qtbase",
+          "default-features": false,
+          "features": [
+            "widgets"
+          ]
+        },
+        {
+          "name": "qtbase",
+          "default-features": false,
+          "features": [
+            "windeployqt"
+          ],
+          "platform": "windows"
+        }
+      ]
+    }
+  }
 }

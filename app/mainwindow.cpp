@@ -4,6 +4,9 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <pcl/common/colors.h>
+#include <vtkGenericOpenGLRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 
 #include <type_traits>
 #include <variant>
@@ -24,17 +27,23 @@ QString toQString(const std::filesystem::path& path) {
 }  // namespace
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent),
-      ui_(std::make_unique<Ui::MainWindow>()),
-      viewer_(new pcl::visualization::PCLVisualizer("viewer", /*create_interactor=*/false)) {
+    : QMainWindow(parent), ui_(std::make_unique<Ui::MainWindow>()) {
     ui_->setupUi(this);
     setWindowTitle(tr("PCL Application"));
 
-    // Hand the visualizer's render window to the embedded VTK widget.
-    ui_->qvtkWidget->SetRenderWindow(viewer_->getRenderWindow());
-    viewer_->setupInteractor(ui_->qvtkWidget->GetInteractor(), ui_->qvtkWidget->GetRenderWindow());
+    // The Qt widget owns the OpenGL context, so the visualizer must not open a
+    // window of its own. It gets a render window that draws into whatever
+    // context is current, and that window is then handed to the widget.
+    auto renderer = vtkSmartPointer<vtkRenderer>::New();
+    auto renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    renderWindow->AddRenderer(renderer);
+    viewer_ = pcl::make_shared<pcl::visualization::PCLVisualizer>(
+        renderer, renderWindow, "viewer", /*create_interactor=*/false);
+
+    ui_->qvtkWidget->setRenderWindow(viewer_->getRenderWindow());
+    viewer_->setupInteractor(ui_->qvtkWidget->interactor(), ui_->qvtkWidget->renderWindow());
     viewer_->resetCamera();
-    ui_->qvtkWidget->update();
+    refreshView();
 }
 
 // Defined here, where Ui::MainWindow is a complete type for unique_ptr.
@@ -74,6 +83,8 @@ void MainWindow::on_loadFile_clicked() {
         statusBar()->showMessage(
             tr("Loaded %1 points from %2").arg(session.source()->size()).arg(file));
         showCloud(session.source(), "source");
+        viewer_->resetCamera();  // frame the new cloud; later views keep the camera
+        refreshView();
     });
 }
 
@@ -123,7 +134,7 @@ template <typename PointT>
 void MainWindow::showCloud(const pclapp::CloudPtr<PointT>& cloud, const std::string& id) {
     viewer_->removeAllPointClouds();
     viewer_->addPointCloud<PointT>(cloud, id);
-    ui_->qvtkWidget->update();
+    refreshView();
 }
 
 template <typename PointT>
@@ -142,7 +153,11 @@ void MainWindow::showClusters(const std::vector<pclapp::CloudPtr<PointT>>& clust
             clusters[i], color.r, color.g, color.b);
         viewer_->addPointCloud<PointT>(clusters[i], handler, "cluster" + std::to_string(i));
     }
-    ui_->qvtkWidget->update();
+    refreshView();
+}
+
+void MainWindow::refreshView() {
+    ui_->qvtkWidget->renderWindow()->Render();
 }
 
 pclapp::VoxelGridParams MainWindow::voxelParamsFromUi() const {

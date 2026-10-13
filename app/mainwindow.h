@@ -50,6 +50,7 @@ private:
     pclapp::VoxelGridParams voxelParamsFromUi() const;
     pclapp::EuclideanClusterParams clusterParamsFromUi() const;
     void reportError(const std::exception& error);
+    void refreshView();  ///< Redraws the 3D view after its content changed.
 
     std::unique_ptr<Ui::MainWindow> ui_;
     pcl::visualization::PCLVisualizer::Ptr viewer_;
