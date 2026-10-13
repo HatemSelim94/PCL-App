@@ -1,3 +1,6 @@
 # Store text files with LF in the repository on every platform; Git converts
 # on checkout according to each user's settings. Binary files are detected.
 * text=auto
+
+# PCD files can hold binary data, so their line endings are never converted.
+*.pcd binary
