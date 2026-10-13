@@ -24,14 +24,10 @@ actually been built and run, and where:
 | Core and C++ tests | builds, 8 of 8 tests pass | builds, 8 of 8 tests pass |
 | Python package and tests | Python 3.11, 3.12 and 3.13: 21 of 21 tests pass | Python 3.12: 20 pass, 1 skipped (it creates a symlink, which needs extra rights on Windows) |
 | MCP server used from Claude Code | not tried; covered by the tests, which drive the server with the MCP SDK's client | registered in Claude Code 2.1.296 and used to load, cluster and save the sample cloud |
-| Desktop application | not built since the rewrite | not built since the rewrite |
+| Desktop application | Qt 5.15, VTK 9.1: builds and runs; every button checked on a virtual display | not built yet with Qt 6 (build in progress) |
 
-On every push, the CI workflow repeats the Linux build, the C++ tests and the
-Python tests (with the runner's system Python).
-
-The desktop application still targets Qt 5 with VTK 8 (`QVTKWidget`). VTK 9
-removed that widget, so the application has to be ported before it builds on
-current toolchains.
+On every push, the CI workflow repeats the Linux build, the C++ tests, the
+Python tests (with the runner's system Python) and the application build.
 
 **What is mine and what is not.** The geometry algorithms (voxel grid filter,
 Euclidean cluster extraction, bounding box, centroid, PCD I/O) are PCL's. The
@@ -192,13 +188,36 @@ objects and drops the stray points because they stay below the minimum size.
 
 ## Desktop application
 
-Not buildable on current toolchains yet, see [Status](#status). The application
-needs Qt 5 Widgets and VTK 8 in addition to PCL, and is switched on with
-`-DPCLAPP_BUILD_APP=ON` (the default when the option is not given). Its features:
+A Qt Widgets front end around the core, with a VTK 3D view
+(`QVTKOpenGLNativeWidget`, so it needs VTK 9). Its features:
 
 * Load `.pcd` and plain-text (`x y z [intensity]`) clouds as `PointXYZ` or `PointXYZI`
 * Voxel-grid downsampling
 * Euclidean cluster extraction, each cluster drawn in a distinct colour
 * Save the filtered cloud, or convert the source between `.pcd` and `.txt`
 
-![](media/layout.PNG)
+![The application after clustering the sample cloud](media/app-clusters.png)
+
+*The sample cloud after "cluster" and "show clusters", on Ubuntu 24.04.*
+
+The application uses whichever Qt major version VTK was built with: Qt 5 with
+the Ubuntu 24.04 packages, Qt 6 with vcpkg. The source is the same for both.
+
+Linux (needs `libvtk9-qt-dev` and `qtbase5-dev` in addition to `libpcl-dev`):
+
+```sh
+cmake --preset app
+cmake --build --preset app
+./build-app/PclApp
+```
+
+Windows, with everything from vcpkg. The `app` feature of `vcpkg.json` adds
+PCL's visualization module, VTK with Qt support and Qt 6, which vcpkg builds
+from source the first time; this takes hours:
+
+```bat
+set VCPKG_ROOT=C:cpkg
+cmake --preset app-vcpkg
+cmake --build --preset app-vcpkg
+build-app\Release\PclApp.exe
+```

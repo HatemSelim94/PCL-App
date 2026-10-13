@@ -40,8 +40,13 @@ After changing `python/src/bindings.cpp` or anything in `core/`, run the
 `pip install` line again before `pytest`: the tests import the installed
 package, not the source tree.
 
-The desktop application (`-DPCLAPP_BUILD_APP=ON`) does not build on current
-toolchains: it uses `QVTKWidget`, which VTK 9 removed.
+Desktop application (needs VTK 9 with Qt support; Qt 5 on Ubuntu, Qt 6 with
+vcpkg):
+
+```sh
+cmake --preset app            # Linux; app-vcpkg on Windows
+cmake --build --preset app
+```
 
 ## Conventions
 
