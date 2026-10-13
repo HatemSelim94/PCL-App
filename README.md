@@ -213,7 +213,10 @@ cmake --build --preset app
 
 Windows, with everything from vcpkg. The `app` feature of `vcpkg.json` adds
 PCL's visualization module, VTK with Qt support and Qt 6, which vcpkg builds
-from source the first time; this takes hours:
+from source the first time; this takes hours. This preset installs the
+dependencies into vcpkg's own `installed` folder instead of the build tree:
+one of them (libiconv, built with autotools) fails when the install path
+contains a space, as a project folder easily does.
 
 ```bat
 set VCPKG_ROOT=C:cpkg

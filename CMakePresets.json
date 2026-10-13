@@ -37,7 +37,8 @@
       "inherits": "app",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "VCPKG_MANIFEST_FEATURES": "app"
+        "VCPKG_MANIFEST_FEATURES": "app",
+        "VCPKG_INSTALLED_DIR": "$env{VCPKG_ROOT}/installed"
       }
     }
   ],
