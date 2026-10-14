@@ -62,6 +62,17 @@ lupdate -pluralonly -no-obsolete app/mainwindow.cpp -ts app/translations/pclapp_
 The build compiles them with lrelease and copies the `.qm` files next to the
 executable. Language names in the menu stay in their own language.
 
+Docker (Linux image with the core tests, the Python tests and the MCP server):
+
+```sh
+docker build -t pclapp .
+docker run -i --rm -v "$PWD/data:/data" pclapp
+```
+
+CI (`.github/workflows/ci.yml`) runs Linux, Windows and Docker jobs on every
+push. The Windows job keeps vcpkg's binary cache in the Actions cache, keyed
+on `vcpkg.json`; changing the manifest means one slow run.
+
 ## Conventions
 
 - C++17, formatted with the repository's `.clang-format`.
