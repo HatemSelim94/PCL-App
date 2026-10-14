@@ -201,9 +201,9 @@ loaded, "Show clusters" only once clusters exist. The interface is available
 in English, German, French and Spanish (Settings > Language; the choice is
 remembered, the default follows the system language).
 
-![The application after clustering the sample cloud](media/app-clusters.png)
+![The application after clustering the sample cloud](media/app-clusters-windows.png)
 
-*The sample cloud after "Cluster", on Ubuntu 24.04.*
+*The sample cloud after "Cluster", on Windows 11 with Qt 6.*
 
 The application uses whichever Qt major version VTK was built with: Qt 5 with
 the Ubuntu 24.04 packages, Qt 6 with vcpkg. The source is the same for both.
