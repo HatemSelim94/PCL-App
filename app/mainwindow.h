@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QEvent>
 #include <QMainWindow>
 #include <QString>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -30,6 +31,10 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
+protected:
+    /// Re-applies all translatable texts after the language was switched.
+    void changeEvent(QEvent* event) override;
+
 private slots:
     // Named after the widgets in mainwindow.ui so connectSlotsByName() wires them.
     void on_actionOpen_triggered();
@@ -58,11 +63,14 @@ private:
     pclapp::VoxelGridParams voxelParamsFromUi() const;
     pclapp::EuclideanClusterParams clusterParamsFromUi() const;
     void reportError(const std::exception& error);
-    void refreshView();     ///< Redraws the 3D view after its content changed.
-    void updateControls();  ///< Enables the buttons the current state allows.
+    void refreshView();      ///< Redraws the 3D view after its content changed.
+    void updateControls();   ///< Enables the buttons the current state allows.
+    void updateFileLabel();  ///< Shows the loaded file, its point count and type.
+    void setupLanguageMenu();
 
     std::unique_ptr<Ui::MainWindow> ui_;
     pcl::visualization::PCLVisualizer::Ptr viewer_;
     pclapp::AnyCloudSession session_;
     QString lastDirectory_;  ///< Where the file dialog opens next time.
+    QString loadedFile_;     ///< Name of the loaded file, for the panel label.
 };

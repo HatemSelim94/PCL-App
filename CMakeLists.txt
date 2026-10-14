@@ -45,16 +45,34 @@ if(PCLAPP_BUILD_APP)
   # VTK is built against one Qt major version and the application must use the
   # same one: Qt 6 with vcpkg, Qt 5 with the Ubuntu 24.04 packages. VTK reports
   # which in VTK_QT_VERSION. The application code is the same for both.
-  find_package(Qt${VTK_QT_VERSION} REQUIRED COMPONENTS Widgets)
+  set(QT_DEFAULT_MAJOR_VERSION ${VTK_QT_VERSION})  # lets the versionless qt_* commands work
+  find_package(Qt${VTK_QT_VERSION} REQUIRED COMPONENTS Widgets LinguistTools)
 
   set(CMAKE_AUTOMOC ON)
   set(CMAKE_AUTOUIC ON)
 
   add_executable(PclApp
     app/main.cpp
+    app/language.cpp
+    app/language.h
     app/mainwindow.cpp
     app/mainwindow.h
     app/mainwindow.ui)
+
+  # Translations: the .ts sources are updated with lupdate (see CLAUDE.md) and
+  # edited by hand; lrelease compiles them to .qm at build time. The .qm files
+  # are copied next to the executable, where language.cpp looks for them.
+  set(PCLAPP_TRANSLATIONS
+    app/translations/pclapp_en.ts   # plural forms only; the rest of English is in the source
+    app/translations/pclapp_de.ts
+    app/translations/pclapp_fr.ts
+    app/translations/pclapp_es.ts)
+  qt_add_translation(PCLAPP_QM_FILES ${PCLAPP_TRANSLATIONS})
+  target_sources(PclApp PRIVATE ${PCLAPP_QM_FILES})
+  add_custom_command(TARGET PclApp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:PclApp>/translations"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PCLAPP_QM_FILES} "$<TARGET_FILE_DIR:PclApp>/translations"
+    COMMENT "Copying the translations next to PclApp")
   target_link_libraries(PclApp PRIVATE
     pclapp_core pclapp_warnings Qt${VTK_QT_VERSION}::Widgets ${VTK_LIBRARIES})
 

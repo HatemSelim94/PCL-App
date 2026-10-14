@@ -2,6 +2,7 @@
 #include <QSurfaceFormat>
 #include <QVTKOpenGLNativeWidget.h>
 
+#include "language.h"
 #include "mainwindow.h"
 
 int main(int argc, char* argv[]) {
@@ -10,6 +11,10 @@ int main(int argc, char* argv[]) {
     QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 
     QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("HatemSelim");  // where QSettings stores the language
+    QCoreApplication::setApplicationName("PclApp");
+    pclapp::app::applyLanguage(pclapp::app::savedLanguageCode());
+
     MainWindow window;
     window.show();
     return app.exec();

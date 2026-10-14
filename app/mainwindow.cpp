@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QActionGroup>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -12,6 +13,7 @@
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
 
+#include "language.h"
 #include "ui_mainwindow.h"
 
 namespace {
@@ -48,7 +50,42 @@ MainWindow::MainWindow(QWidget* parent)
     viewer_->resetCamera();
     refreshView();
 
+    setupLanguageMenu();
     updateControls();
+}
+
+void MainWindow::changeEvent(QEvent* event) {
+    if (event->type() == QEvent::LanguageChange) {
+        ui_->retranslateUi(this);
+        updateFileLabel();
+    }
+    QMainWindow::changeEvent(event);
+}
+
+void MainWindow::setupLanguageMenu() {
+    // One checkable action per language plus "system default"; the group
+    // keeps exactly one checked. The code travels in the action's data.
+    auto* group = new QActionGroup(this);
+    const QString saved = pclapp::app::savedLanguageCode();
+
+    auto addLanguage = [&](const QString& code, const QString& name) {
+        QAction* action = ui_->menuLanguage->addAction(name);
+        action->setCheckable(true);
+        action->setData(code);
+        action->setChecked(code == saved);
+        group->addAction(action);
+    };
+    addLanguage(QString(), tr("System default"));
+    ui_->menuLanguage->addSeparator();
+    for (const auto& language : pclapp::app::availableLanguages()) {
+        addLanguage(language.code, language.nativeName);
+    }
+
+    connect(group, &QActionGroup::triggered, this, [](QAction* action) {
+        const QString code = action->data().toString();
+        pclapp::app::saveLanguageCode(code);
+        pclapp::app::applyLanguage(code);
+    });
 }
 
 // Defined here, where Ui::MainWindow is a complete type for unique_ptr.
@@ -100,13 +137,11 @@ void MainWindow::on_loadButton_clicked() {
         return;
     }
 
+    loadedFile_ = QFileInfo(file).fileName();
     withSession([&](auto& session) {
-        const auto points = session.source()->size();
-        ui_->fileLabel->setText(tr("%1\n%2 points, %3")
-                                    .arg(QFileInfo(file).fileName())
-                                    .arg(points)
-                                    .arg(ui_->xyziRadio->isChecked() ? "XYZI" : "XYZ"));
-        statusBar()->showMessage(tr("Loaded %1 points from %2").arg(points).arg(file));
+        updateFileLabel();
+        statusBar()->showMessage(
+            tr("Loaded %1 points from %2").arg(session.source()->size()).arg(file));
         showCloud(session.source(), "source");
         viewer_->resetCamera();  // frame the new cloud; later views keep the camera
         refreshView();
@@ -134,9 +169,8 @@ void MainWindow::on_showDownsampledButton_clicked() {
 void MainWindow::on_clusterButton_clicked() {
     withSession([&](auto& session) {
         session.extractClusters(clusterParamsFromUi());
-        const auto count = session.clusters().size();
-        statusBar()->showMessage(count == 1 ? tr("Found 1 cluster")
-                                            : tr("Found %1 clusters").arg(count));
+        const int count = static_cast<int>(session.clusters().size());
+        statusBar()->showMessage(tr("Found %n cluster(s)", nullptr, count));  // plural per language
         showClusters(session.clusters());
     });
 }
@@ -201,6 +235,23 @@ pclapp::EuclideanClusterParams MainWindow::clusterParamsFromUi() const {
 
 void MainWindow::reportError(const std::exception& error) {
     QMessageBox::warning(this, tr("Operation failed"), QString::fromUtf8(error.what()));
+}
+
+void MainWindow::updateFileLabel() {
+    std::visit(
+        [&](const auto& session) {
+            if constexpr (std::is_same_v<std::decay_t<decltype(session)>, std::monostate>) {
+                ui_->fileLabel->setText(tr("No file loaded"));
+            } else {
+                ui_->fileLabel->setText(tr("%1\n%2 points, %3")
+                                            .arg(loadedFile_)
+                                            .arg(session.source()->size())
+                                            .arg(ui_->xyziRadio->isChecked()
+                                                     ? QStringLiteral("XYZI")
+                                                     : QStringLiteral("XYZ")));
+            }
+        },
+        session_);
 }
 
 void MainWindow::refreshView() {

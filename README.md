@@ -197,7 +197,9 @@ A Qt Widgets front end around the core, with a VTK 3D view
 * Save the downsampled cloud, or convert the source between `.pcd` and `.txt`
 
 Buttons become available as the workflow allows: nothing before a file is
-loaded, "Show clusters" only once clusters exist.
+loaded, "Show clusters" only once clusters exist. The interface is available
+in English, German, French and Spanish (Settings > Language; the choice is
+remembered, the default follows the system language).
 
 ![The application after clustering the sample cloud](media/app-clusters.png)
 
@@ -206,7 +208,8 @@ loaded, "Show clusters" only once clusters exist.
 The application uses whichever Qt major version VTK was built with: Qt 5 with
 the Ubuntu 24.04 packages, Qt 6 with vcpkg. The source is the same for both.
 
-Linux (needs `libvtk9-qt-dev` and `qtbase5-dev` in addition to `libpcl-dev`):
+Linux (needs `libvtk9-qt-dev`, `qtbase5-dev` and `qttools5-dev-tools` in
+addition to `libpcl-dev`):
 
 ```sh
 cmake --preset app

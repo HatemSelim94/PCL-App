@@ -38,8 +38,15 @@
             "windeployqt"
           ],
           "platform": "windows"
+        },
+        {
+          "name": "qttools",
+          "default-features": false,
+          "features": [
+            "linguist"
+          ]
         }
       ]
     }
   }
-}
+}\n

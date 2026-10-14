@@ -48,6 +48,20 @@ cmake --preset app            # Linux; app-vcpkg on Windows
 cmake --build --preset app
 ```
 
+The application is translated (English, German, French, Spanish). After
+changing or adding user-visible strings, refresh the translation sources and
+fill in the new entries by hand:
+
+```sh
+lupdate -no-obsolete app/main.cpp app/mainwindow.cpp app/mainwindow.h app/mainwindow.ui \
+    app/language.cpp -ts app/translations/pclapp_de.ts app/translations/pclapp_fr.ts \
+    app/translations/pclapp_es.ts
+lupdate -pluralonly -no-obsolete app/mainwindow.cpp -ts app/translations/pclapp_en.ts
+```
+
+The build compiles them with lrelease and copies the `.qm` files next to the
+executable. Language names in the menu stay in their own language.
+
 ## Conventions
 
 - C++17, formatted with the repository's `.clang-format`.
@@ -62,6 +76,8 @@ cmake --build --preset app
   paths; every path a client supplies goes through `resolve_in_data_dir`.
 - The MCP server must never write to stdout, because stdout is the protocol
   channel.
+- Every user-visible string in `app/` goes through `tr()` (or the `.ui`
+  file), and the translation files are updated in the same change.
 - New behaviour gets a test: Catch2 in `tests/core_tests.cpp`, pytest in
   `tests/python/`.
 - Commit messages follow `type(scope): summary` (feat, fix, refactor, test,
