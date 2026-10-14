@@ -189,16 +189,19 @@ objects and drops the stray points because they stay below the minimum size.
 ## Desktop application
 
 A Qt Widgets front end around the core, with a VTK 3D view
-(`QVTKOpenGLNativeWidget`, so it needs VTK 9). Its features:
+(`QVTKOpenGLNativeWidget`, so it needs VTK 9). The panel follows the workflow:
 
-* Load `.pcd` and plain-text (`x y z [intensity]`) clouds as `PointXYZ` or `PointXYZI`
-* Voxel-grid downsampling
-* Euclidean cluster extraction, each cluster drawn in a distinct colour
-* Save the filtered cloud, or convert the source between `.pcd` and `.txt`
+* **Load** a `.pcd` or plain-text (`x y z [intensity]`) cloud as `PointXYZ` or `PointXYZI`
+* **Downsample** with a voxel grid
+* **Cluster** with Euclidean cluster extraction; each cluster is drawn in its own colour
+* Save the downsampled cloud, or convert the source between `.pcd` and `.txt`
+
+Buttons become available as the workflow allows: nothing before a file is
+loaded, "Show clusters" only once clusters exist.
 
 ![The application after clustering the sample cloud](media/app-clusters.png)
 
-*The sample cloud after "cluster" and "show clusters", on Ubuntu 24.04.*
+*The sample cloud after "Cluster", on Ubuntu 24.04.*
 
 The application uses whichever Qt major version VTK was built with: Qt 5 with
 the Ubuntu 24.04 packages, Qt 6 with vcpkg. The source is the same for both.

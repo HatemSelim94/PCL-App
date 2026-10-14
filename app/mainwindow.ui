@@ -2,278 +2,362 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowTitle">
+   <string>PCL App</string>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>912</width>
-    <height>678</height>
+    <width>1100</width>
+    <height>700</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>800</width>
-    <height>600</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>1200</width>
-    <height>800</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>MainWindow</string>
-  </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
-  </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="0">
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>58</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="2" rowspan="3">
-       <widget class="QVTKOpenGLNativeWidget" name="qvtkWidget">
-        <property name="minimumSize">
-         <size>
-          <width>600</width>
-          <height>600</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <layout class="QGridLayout" name="gridLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMinAndMaxSize</enum>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="verticalSpacing">
-         <number>6</number>
-        </property>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="XYZData">
-          <property name="text">
-           <string>XYZ</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">buttonGroup</string>
-          </attribute>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QCheckBox" name="XYZIData">
-          <property name="text">
-           <string>XYZI</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">buttonGroup</string>
-          </attribute>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="loadFile">
-          <property name="text">
-           <string>load file</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="showPointCloud">
-          <property name="text">
-           <string>show file content</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QDoubleSpinBox" name="voxelLeafSize">
-          <property name="minimum">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>10.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.050000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>voxel leaf size</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="Filter">
-          <property name="text">
-           <string>filter</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="3">
-         <widget class="QPushButton" name="showFilteredCloud">
-          <property name="text">
-           <string>show filtered cloud</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QDoubleSpinBox" name="distanceTolerance">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>0.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.500000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1" colspan="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>distance tolerance</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QSpinBox" name="minClusterPoints">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>3000</number>
-          </property>
-          <property name="value">
-           <number>20</number>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1" colspan="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>min. cluster points</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
-         <widget class="QSpinBox" name="maxClusterPoints">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>10000</number>
-          </property>
-          <property name="singleStep">
-           <number>10</number>
-          </property>
-          <property name="value">
-           <number>3000</number>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="1" colspan="2">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>max. cluster points</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QPushButton" name="Cluster">
-          <property name="text">
-           <string>cluster</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="0" colspan="2">
-         <widget class="QPushButton" name="showClusters">
-          <property name="text">
-           <string>show clusters</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0" colspan="2">
-         <widget class="QPushButton" name="saveFilteredCloud">
-          <property name="text">
-           <string>save filtered cloud</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="2">
-         <widget class="QPushButton" name="ConvertFile">
-          <property name="text">
-           <string>convert file</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="0" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>48</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="font">
-         <font>
-          <family>Karumbi</family>
-          <pointsize>8</pointsize>
-          <weight>50</weight>
-          <italic>true</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Hatem Selim</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+   <layout class="QHBoxLayout" name="mainLayout">
+    <item>
+     <widget class="QWidget" name="controls" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumWidth">
+       <number>260</number>
+      </property>
+      <property name="maximumWidth">
+       <number>260</number>
+      </property>
+      <layout class="QVBoxLayout" name="controlsLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="loadGroup">
+         <property name="title">
+          <string>Load</string>
+         </property>
+         <layout class="QVBoxLayout" name="loadLayout">
+          <item>
+           <layout class="QHBoxLayout" name="pointTypeLayout">
+            <item>
+             <widget class="QLabel" name="pointTypeLabel">
+              <property name="text">
+               <string>Point type</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="xyzRadio">
+              <property name="text">
+               <string>XYZ</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="xyziRadio">
+              <property name="text">
+               <string>XYZI</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadButton">
+            <property name="text">
+             <string>Load…</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="fileLabel">
+            <property name="text">
+             <string>No file loaded</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showSourceButton">
+            <property name="text">
+             <string>Show source</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="downsampleGroup">
+         <property name="title">
+          <string>Downsample</string>
+         </property>
+         <layout class="QVBoxLayout" name="downsampleLayout">
+          <item>
+           <layout class="QFormLayout" name="downsampleForm">
+            <item row="0" column="0">
+             <widget class="QLabel" name="leafSizeLabel">
+              <property name="text">
+               <string>Leaf size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="leafSizeSpin">
+              <property name="toolTip">
+               <string>Edge length of one voxel, in the cloud's units</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>0.001000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="downsampleButton">
+            <property name="text">
+             <string>Downsample</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showDownsampledButton">
+            <property name="text">
+             <string>Show result</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="clusterGroup">
+         <property name="title">
+          <string>Cluster</string>
+         </property>
+         <layout class="QVBoxLayout" name="clusterLayout">
+          <item>
+           <layout class="QFormLayout" name="clusterForm">
+            <item row="0" column="0">
+             <widget class="QLabel" name="toleranceLabel">
+              <property name="text">
+               <string>Tolerance</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="toleranceSpin">
+              <property name="toolTip">
+               <string>Largest gap between neighbouring points of one cluster</string>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>0.001000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.500000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="minPointsLabel">
+              <property name="text">
+               <string>Min. points</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="minPointsSpin">
+              <property name="toolTip">
+               <string>Smaller clusters are dropped</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000000</number>
+              </property>
+              <property name="value">
+               <number>20</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="maxPointsLabel">
+              <property name="text">
+               <string>Max. points</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="maxPointsSpin">
+              <property name="toolTip">
+               <string>Larger clusters are dropped</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10000000</number>
+              </property>
+              <property name="singleStep">
+               <number>1000</number>
+              </property>
+              <property name="value">
+               <number>100000</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clusterButton">
+            <property name="text">
+             <string>Cluster</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showClustersButton">
+            <property name="text">
+             <string>Show clusters</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="controlsSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveButton">
+         <property name="toolTip">
+          <string>Write the downsampled cloud as &lt;name&gt;_filtered next to the source file</string>
+         </property>
+         <property name="text">
+          <string>Save downsampled cloud</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="convertButton">
+         <property name="toolTip">
+          <string>Write the source cloud in the other format (.pcd or .txt) next to the source file</string>
+         </property>
+         <property name="text">
+          <string>Convert source file</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QVTKOpenGLNativeWidget" name="viewWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>300</height>
+       </size>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>912</width>
-     <height>22</height>
-    </rect>
-   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -283,8 +367,12 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+  </connection>
+ </connections>
 </ui>
