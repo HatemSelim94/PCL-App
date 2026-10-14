@@ -24,7 +24,7 @@ actually been built and run, and where:
 | Core and C++ tests | builds, 8 of 8 tests pass | builds, 8 of 8 tests pass |
 | Python package and tests | Python 3.11, 3.12 and 3.13: 21 of 21 tests pass | Python 3.12: 20 pass, 1 skipped (it creates a symlink, which needs extra rights on Windows) |
 | MCP server used from Claude Code | not tried; covered by the tests, which drive the server with the MCP SDK's client | registered in Claude Code 2.1.296 and used to load, cluster and save the sample cloud |
-| Desktop application | Qt 5.15, VTK 9.1: builds and runs; every button checked on a virtual display | Qt 6.11.2, VTK 9.3 from vcpkg: builds and runs |
+| Desktop application | Qt 5.15, VTK 9.1: builds and runs; every button and all four languages checked on a virtual display | Qt 6.11.2, VTK 9.3 from vcpkg: builds and runs, language switch checked |
 
 On every push, the CI workflow repeats the Linux build, the C++ tests, the
 Python tests (with the runner's system Python) and the application build.
