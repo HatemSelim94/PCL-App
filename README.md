@@ -8,11 +8,10 @@ Loading, voxel downsampling and Euclidean clustering of point clouds, in four la
   through the same code, running locally over stdio with no network access
 * the original **Qt desktop application**
 
-![](media/gif.gif)
+![Loading, downsampling and clustering the sample cloud, then switching the language](media/app-demo.gif)
 
-*The recording shows the 2021 version of the desktop application.*
-Video walkthrough [here](https://drive.google.com/file/d/1E5WDR_QrXmQEPO-EXV3cmHHyO9Jrx7uP/view?usp=sharing)
-*(set the quality to 720p manually)*.
+*The desktop application: load the sample cloud, downsample, cluster, switch
+the language to German. Recorded on Ubuntu 24.04.*
 
 ## Status
 
