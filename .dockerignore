@@ -1,0 +1,9 @@
+.git
+.venv
+build
+build-app
+build-*
+__pycache__
+*.pyc
+.pytest_cache
+media
