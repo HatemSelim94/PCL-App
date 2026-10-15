@@ -2,18 +2,53 @@
 
 [![CI](https://github.com/HatemSelim94/PCL-App/actions/workflows/ci.yml/badge.svg)](https://github.com/HatemSelim94/PCL-App/actions/workflows/ci.yml)
 
-Loading, voxel downsampling and Euclidean clustering of point clouds, in four layers:
+A small, tested C++17 core for loading, downsampling and clustering point
+clouds with the Point Cloud Library (PCL), exposed three ways: a Qt desktop
+application, a Python package, and an MCP server through which Claude (or any
+MCP client) can run the same operations locally, with no cloud dependency.
 
-* a header-only **C++17 core** on top of the Point Cloud Library (PCL), with unit tests
-* **Python bindings** for that core (pybind11)
-* an **MCP server** that lets an LLM such as Claude load, filter and cluster clouds
-  through the same code, running locally over stdio with no network access
-* the original **Qt desktop application**
+![Claude Code loading, clustering and saving a point cloud through the MCP server](media/claude-code-mcp.png)
 
-![Loading, downsampling and clustering the sample cloud, then switching the language](media/app-demo.gif)
+*Claude Code using the six MCP tools on the sample cloud: list, load,
+cluster, save.*
 
-*The desktop application: load the sample cloud, downsample, cluster, switch
-the language to German. Recorded on Ubuntu 24.04.*
+![The desktop application: load, downsample, cluster, switch the language](media/app-demo.gif)
+
+*The desktop application doing the same by hand, then switching to German.*
+
+## How it fits together
+
+```
+                 .pcd / .txt / .xyz files
+                            │
+            core/  header-only C++17 on PCL  ──  tests/core_tests.cpp (Catch2)
+              │                        │
+   app/  Qt desktop            python/  pybind11 bindings  ──  tests/python/ (pytest)
+   application                          │
+                               pclapp.mcp_server  (MCP over stdio)
+                                        │
+                            Claude Code  ·  Docker image  ·  any MCP client
+```
+
+Everything above the core is a thin layer: the application and the bindings
+only convert types, the server only keeps clouds by id and checks paths. The
+geometry is PCL's; the design around it is mine.
+
+## Try it
+
+The quickest route is the Docker image, which builds the core, runs both test
+suites and starts the MCP server on a folder of your choice:
+
+```sh
+docker build -t pclapp .
+claude mcp add --transport stdio pclapp -- docker run -i --rm -v "$PWD/data:/data" pclapp
+```
+
+(On Windows, write the absolute path of the `data` folder instead of `$PWD/data`.)
+Then, in Claude Code: *"Using the pclapp tools, load sample_objects.pcd and
+cluster it with tolerance 0.15."* Without Docker, see [Python package](#python-package)
+and [MCP server](#mcp-server); for the desktop application, see
+[Desktop application](#desktop-application).
 
 ## Status
 
